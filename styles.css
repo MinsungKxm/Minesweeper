@@ -1,0 +1,41 @@
+/*
+Beginner Level: 8x8
+Intermediate: 16x16
+Expert Level: 30x16
+
+Let's make the expert level first and THEN we can
+do the rest, or just stick with expert level;
+*/
+
+.container{
+  height: 100vh;
+}
+.header{
+  width: 100vw;
+}
+.grid-container{
+  grid-template-columns: repeat(30, 1fr);
+  grid-template-rows: repeat(16, 1fr);
+  background-color: #4682B4;
+  width: 100vw;
+  height: 100vh;
+}
+.cell{
+
+}
+
+.hidden{
+  background-image: url("./images/tile.png");
+}
+.mine{
+  
+}
+.one{
+  background-image: url("./images/1.png");
+}
+.two{
+  background-image: url("./images/2.png");
+}
+.three{
+  background-image: url("./images/3.png");
+}
