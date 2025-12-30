@@ -14,7 +14,9 @@ There will be 3 types of classes for cell:
 */
 var mine_cnt = 0;
 // I need to initalize every cell
+const board = [];
 for(let i = 0; i < 16; i++){
+  board[i] = [];
   for(let j = 0; j < 30; j++){
     board[i][j] = {
       mine: false,
@@ -24,18 +26,30 @@ for(let i = 0; i < 16; i++){
     };
   }
 }
+
 //placing mines
-for(let k = 0; k < 99; k++){
-  var i = Math.round(Math.random() * 16);
-  var j = Math.round(Math.random() * 30);
-  if(board[i][j].mine == true) continue;
+while(mine_cnt < 99){
+  var i = Math.floor(Math.random() * 16);
+  var j = Math.floor(Math.random() * 30);
+  if(board[i][j].mine) continue;
   board[i][j].mine = true;
   mine_cnt++;
-
 }
 //find the number of adjacent mines 
-for(let i = 0; i < rows; i++){
-  for(let j = 0; j < cols; j++){
+var sprite_sheet = document.getElementById("board");
+for(let i = 0; i < 16; i++){
+  for(let j = 0; j < 30; j++){
+    const cell = document.createElement('div');
+    cell.classList.add('cell', 'hidden');
+    cell.dataset.row = i;
+    cell.dataset.col = j;
+
+    sprite_sheet.appendChild(cell);
+  }
+}
+
+for(let i = 0; i < 16; i++){
+  for(let j = 0; j < 30; j++){
     if(board[i][j].mine) continue;  
     var cnt = 0;
     // Check the 8 surrounding cells
@@ -43,30 +57,69 @@ for(let i = 0; i < rows; i++){
       for(let y = -1; y <= 1; y++){
         const ni = i + x;
         const nj = j + y;
-        if(ni >= 0 && ni < rows && nj >= 0 && nj < cols && board[ni][nj].mine) cnt++;
+        if(x == 0 && y == 0) continue;
+        if(ni >= 0 && ni < 16 && nj >= 0 && nj < 30 && board[ni][nj].mine) cnt++;
       }
     }
+    console.log(cnt);
     board[i][j].adjacent = cnt;
   }
 }
+
+//Create the grid with cells
+
+
+const cells = document.querySelectorAll('.cell.hidden');
+
 //add eventListener to each cell for clicks
 // If clicked, change the class of the cell for visuals and keep 
 // track of the number of mines left in javascript
 
+for(let i = 0; i < 16; i++){
+  for(let j = 0; j < 30; j++){
+    cells[30*i+j].addEventListener("click", () => reveal_cell(i, j));
+  }
+}
 
 // Called when a cell is clicked
 function reveal_cell(i, j){
+  var index = 30*i + j;
+  cells[index].classList.remove('hidden');
   // Is the cell you clicked a mine?
   //Else:
-  if(board[i][j] == 0){
-    cell.classList.add('blank');
-  }else if(board[i][j] == 1){
-    cell.classList.add('one');
-  }else if(board[i][j] == 2){
-    cell.classList.add('two');
+  if(board[i][j].mine == true){
+    cells[index].classList.add('mine');
   }else{
-    cell.classList.add('three');
+    cells[index].classList.add(number_to_string(board[i][j].adjacent));
+    if(board[i][j].adjacent == 0){
+      reveal_adjacent_cells(i, j);
+    }
   }
-  //Now uncover the other 8 tiles surrounding it, its neighbors
 }
 
+function reveal_adjacent_cells(i, j){
+  for(let x = -1; x <= 1; x++){
+      for(let y = -1; y <= 1; y++){
+        const ni = i + x;
+        const nj = j + y;
+        var index = ni*30 + nj;
+        if(x == 0 && y == 0) continue;
+        if(ni >= 0 && ni < 16 && nj >= 0 && nj < 30){
+          if(!board[ni][nj].mine){
+            cells[index].classList.add(number_to_string(board[ni][nj].adjacent));
+          }
+        }
+      }
+  }
+}
+function number_to_string(n){
+  if(n == 1) return 'one';
+  else if(n == 2) return 'two';
+  else if(n == 3) return 'three';
+  else if(n == 4) return 'four';
+  else if(n == 5) return 'five';
+  else if(n == 6) return 'six';
+  else if(n == 7) return 'seven';
+  else if(n == 8) return 'eight';
+  else return 'blank';
+}
